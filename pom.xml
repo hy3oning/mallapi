@@ -87,6 +87,13 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.1.1</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+		<!-- 썸네일 이미지 생성용 라이브러리 의존성 -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.20</version>
+		</dependency>
 	</dependencies>
 
 	<build>
