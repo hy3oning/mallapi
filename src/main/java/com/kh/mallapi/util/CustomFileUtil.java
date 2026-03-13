@@ -51,42 +51,52 @@ public class CustomFileUtil {
 		if (files == null || files.isEmpty()) {
 			return Collections.emptyList();
 		}
+		// 저장된 파일명들을 담을 리스트
 		List<String> uploadNames = new ArrayList<>();
-
-		// 전달받은 파일들을 하나씩 저장
+		// 전달받은 파일들을 하나씩 처리
 		for (MultipartFile multipartFile : files) {
 			// 비어 있는 파일은 건너뜀
 			if (multipartFile.isEmpty()) {
 				continue;
 			}
-			// 원본 파일명 추출
+			// 원본 파일명 가져오기
 			String originalName = multipartFile.getOriginalFilename();
-			// 파일명이 없으면 기본 이름 사용, 있으면 경로 정보 제거
+			// 파일명이 없으면 기본 이름 사용, 있으면 경로 제거
 			if (originalName == null || originalName.isBlank()) {
 				originalName = "unknown";
 			} else {
 				originalName = Paths.get(originalName).getFileName().toString();
 			}
-			// UUID를 붙여서 중복되지 않는 저장 파일명 생성
+			// UUID를 붙여 중복되지 않는 저장 파일명 생성
 			String savedName = UUID.randomUUID() + "_" + originalName;
-			// 업로드 폴더 경로와 저장 파일명을 합쳐 저장 위치 생성
+			// 실제 저장 경로 생성
 			Path savePath = Paths.get(uploadPath, savedName);
-			try {
-				// 실제 파일 저장
-				Files.copy(multipartFile.getInputStream(), savePath);
 
-				// 이미지 파일이면 썸네일 생성
+			try {
+				// 원본 파일 저장
+				Files.copy(multipartFile.getInputStream(), savePath);
+				// 저장 정보 로그 출력
+				log.info("saved file: {}", savedName);
+				log.info("original name: {}", originalName);
+				log.info("content type: {}", multipartFile.getContentType());
+				log.info("size: {}", multipartFile.getSize());
+
+				// 이미지 파일이면 썸네일 생성 시도
 				String contentType = multipartFile.getContentType();
 				if (contentType != null && contentType.startsWith("image/")) {
-					Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
-					Thumbnails.of(savePath.toFile()).size(400, 400).toFile(thumbnailPath.toFile());
+					try {
+						Path thumbnailPath = Paths.get(uploadPath, "s_" + savedName);
+						Thumbnails.of(savePath.toFile()).size(400, 400).toFile(thumbnailPath.toFile());
+					} catch (Exception e) {
+						// 썸네일 생성 실패는 로그만 남기고 계속 진행
+						log.warn("Thumbnail creation failed for file: {}", savedName, e);
+					}
 				}
-
-				// 저장된 파일명을 리스트에 추가
+				// 저장된 파일명 리스트에 추가
 				uploadNames.add(savedName);
 
 			} catch (IOException e) {
-				// 저장 중 예외 발생 시 런타임 예외로 처리
+				// 원본 파일 저장 실패 시 예외 발생
 				throw new RuntimeException("File save error", e);
 			}
 		}

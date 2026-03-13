@@ -1,13 +1,22 @@
 package com.kh.mallapi.repository;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.kh.mallapi.domain.Product;
+import com.kh.mallapi.dto.PageRequestDTO;
+import com.kh.mallapi.dto.PageResponseDTO;
+import com.kh.mallapi.dto.ProductDTO;
+import com.kh.mallapi.service.ProductService;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -16,6 +25,8 @@ import lombok.extern.log4j.Log4j2;
 public class ProductRepositoryTests {
 	@Autowired
 	ProductRepository productRepository;
+	@Autowired
+	ProductService productService;
 
 //	 @Test
 	public void testInsert() {
@@ -59,7 +70,7 @@ public class ProductRepositoryTests {
 		productRepository.updateToDelete(pno, true);
 	}
 
-	@Test
+//	@Test
 	public void testUpdate() {
 		Long pno = 10L;
 		Product product = productRepository.selectOne(pno).get();
@@ -72,5 +83,40 @@ public class ProductRepositoryTests {
 		product.addImageString(UUID.randomUUID().toString() + "-" + "NEWIMAGE2.jpg");
 		product.addImageString(UUID.randomUUID().toString() + "-" + "NEWIMAGE3.jpg");
 		productRepository.save(product);
+	}
+
+//	@Test
+	public void testList() {
+		// org.springframework.data.domain 패키지
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("pno").descending());
+		Page<Object[]> result = productRepository.selectList(pageable);
+		// java.util
+		result.getContent().forEach(arr -> log.info(Arrays.toString(arr)));
+	}
+
+//	@Test
+	public void testList2() {
+		// 1 page, 10 size
+		PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
+		PageResponseDTO<ProductDTO> result = productService.getList(pageRequestDTO);
+		result.getDtoList().forEach(dto -> log.info(dto));
+	}
+
+	//@Test
+	public void testRegister() {
+		ProductDTO productDTO = ProductDTO.builder().pname("새로운 상품").pdesc("신규 추가 상품입니다.").price(1000).build();
+		// uuid가 있어야함
+		productDTO.setUploadFileNames(
+				java.util.List.of(UUID.randomUUID() + "_" + "Test1.jpg", UUID.randomUUID() + "_" + "Test2.jpg"));
+		productService.register(productDTO);
+	}
+
+	@Test
+	public void testRead3() {
+		// 실제 존재하는 번호로 테스트(DB에서 확인)
+		Long pno = 9L;
+		ProductDTO productDTO = productService.get(pno);
+		log.info(productDTO);
+		log.info(productDTO.getUploadFileNames());
 	}
 }
