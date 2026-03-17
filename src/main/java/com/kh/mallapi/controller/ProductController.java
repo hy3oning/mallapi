@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,9 +45,9 @@ public class ProductController {
 		Long pno = productService.register(productDTO);
 		try {
 			Thread.sleep(500);
-			} catch (InterruptedException e){
+		} catch (InterruptedException e) {
 			e.printStackTrace();
-			}
+		}
 		return Map.of("result", pno);
 	}
 
@@ -55,14 +56,15 @@ public class ProductController {
 		return fileUtil.getFile(fileName);
 	}
 
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/list")
 	public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
 		log.info("list............." + pageRequestDTO);
 		try {
 			Thread.sleep(500);
-			} catch (InterruptedException e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
-			}
+		}
 		return productService.getList(pageRequestDTO);
 	}
 
