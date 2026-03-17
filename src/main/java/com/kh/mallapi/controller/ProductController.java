@@ -42,6 +42,11 @@ public class ProductController {
 		log.info(uploadFileNames);
 		// 서비스 호출
 		Long pno = productService.register(productDTO);
+		try {
+			Thread.sleep(500);
+			} catch (InterruptedException e){
+			e.printStackTrace();
+			}
 		return Map.of("result", pno);
 	}
 
@@ -53,6 +58,11 @@ public class ProductController {
 	@GetMapping("/list")
 	public PageResponseDTO<ProductDTO> list(PageRequestDTO pageRequestDTO) {
 		log.info("list............." + pageRequestDTO);
+		try {
+			Thread.sleep(500);
+			} catch (InterruptedException e) {
+			e.printStackTrace();
+			}
 		return productService.getList(pageRequestDTO);
 	}
 
@@ -106,9 +116,9 @@ public class ProductController {
 	@DeleteMapping("/{pno}")
 	public Map<String, String> remove(@PathVariable Long pno) {
 		// 삭제해야 할 파일들 알아내기 논리삭제할때는필요없음 물리삭제원하면 따로 메서드 생성
-//		List<String> oldFileNames = productService.get(pno).getUploadFileNames();
+		List<String> oldFileNames = productService.get(pno).getUploadFileNames();
 		productService.remove(pno);
-//		fileUtil.deleteFiles(oldFileNames);
+		fileUtil.deleteFiles(oldFileNames);
 		return Map.of("RESULT", "SUCCESS");
 	}
 
