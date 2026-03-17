@@ -2,7 +2,6 @@ package com.kh.mallapi.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.kh.mallapi.controller.formatter.LocalDateFormatter;
@@ -46,11 +45,11 @@ public class CustomServletConfig implements WebMvcConfigurer {
 	 * - Content-Type : 요청 본문의 데이터 형식 지정
 	 * 예) application/json
 	 */
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("*")
-				.allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH").maxAge(300)
-				.allowedHeaders("Authorization", "Cache-Control", "Content-Type");
-	}
+//	@Override
+//	public void addCorsMappings(CorsRegistry registry) {
+//		registry.addMapping("/**").allowedOrigins("*")
+//				.allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH").maxAge(300)
+//				.allowedHeaders("Authorization", "Cache-Control", "Content-Type");
+//	}
 
 }
